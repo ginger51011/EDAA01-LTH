@@ -1,0 +1,71 @@
+package mountain;
+
+import fractal.Fractal;
+import fractal.TurtleGraphics;
+
+public class Mountain extends Fractal {
+	// Startpunkter
+	private Point a;
+	private Point b;
+	private Point c;
+	
+	public Mountain(Point a, Point b, Point c, double dev) {
+		super();
+		this.a = a;
+		this.b = b;
+		this.c = c;
+	}
+
+	@Override
+	public String getTitle() {
+		return "Mountain";
+	}
+
+	@Override
+	public void draw(TurtleGraphics t) {
+		double dev = 5.0;
+		
+		t.moveTo(a.getX(), a.getY());
+		t.penDown();
+		t.forwardTo(b.getX(), b.getY());
+		t.forwardTo(c.getX(), c.getY());
+		t.forwardTo(a.getX(), a.getY());
+		t.penUp();
+		fractalLine(t, order, a, b, c, dev);
+	}
+	
+	/* 
+	 * Recursive method: Draws a recursive line of the triangle. 
+	 */
+	public void fractalLine(TurtleGraphics t, int order, Point a, Point b, Point c, double dev) {
+		if (order == 0) {
+			t.moveTo(a.getX(), a.getY());
+			t.penDown();
+			t.forwardTo(b.getX(), b.getY());
+			t.forwardTo(c.getX(), c.getY());
+			t.forwardTo(a.getX(), a.getY());
+			t.penUp();
+		} else {
+			// Slumpar fram utseende mer
+			
+			a = new Point(a.getX(), a.getY() + randFunc(dev));
+			b = new Point(b.getX(), b.getY() + randFunc(dev));
+			a = new Point(c.getX(), c.getY() + randFunc(dev));
+			
+			fractalLine(t, order - 1, a, midPoint(a, b), midPoint(a, c), dev / 2);
+			fractalLine(t, order - 1, b, midPoint(b, a), midPoint(b, c), dev / 2);
+			fractalLine(t, order - 1, c, midPoint(c, a), midPoint(c, b), dev / 2);
+			fractalLine(t, order - 1, midPoint(a, b), midPoint(a, c), midPoint(b, c), dev / 2);
+		}
+	}
+	
+	/* 
+	 * Hittar punkten mellan två andra punkter
+	 */
+	private Point midPoint(Point a, Point b) {
+		int newX = (a.getX() + b.getX()) / 2;
+		int newY = (a.getY() + b.getY()) / 2;
+		Point mp = new Point (newX, newY);
+ 		return mp;
+	}
+}

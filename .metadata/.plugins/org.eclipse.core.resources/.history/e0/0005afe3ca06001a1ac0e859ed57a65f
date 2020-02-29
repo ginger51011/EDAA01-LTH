@@ -1,0 +1,96 @@
+package mountain;
+
+import java.util.HashMap;
+
+import fractal.Fractal;
+import fractal.TurtleGraphics;
+import mountain.RandomUtilities;
+
+public class Mountain extends Fractal {
+	// Startpunkter
+	private Point a;
+	private Point b;
+	private Point c;
+	private HashMap<Side, Point> hm;
+	
+	public Mountain(Point a, Point b, Point c) {
+		super();
+		this.a = a;
+		this.b = b;
+		this.c = c;
+		hm = new HashMap<Side, Point>();
+	}
+
+	@Override
+	public String getTitle() {
+		return "Mountain";
+	}
+
+	@Override
+	public void draw(TurtleGraphics t) {
+		double dev = 20.0;
+		fractalLine(t, order, a, b, c, dev);
+	}
+	
+	/* 
+	 * Recursive method: Draws a recursive line of the triangle. 
+	 */
+	public void fractalLine(TurtleGraphics t, int order, Point a, Point b, Point c, double dev) {
+		if (order == 0) {
+			t.moveTo(a.getX(), a.getY());
+			t.penDown();
+			t.forwardTo(b.getX(), b.getY());
+			t.forwardTo(c.getX(), c.getY());
+			t.forwardTo(a.getX(), a.getY());
+			t.penUp();
+		} else {
+			Side ab = new Side(a, b);
+			Side ac = new Side(a, c);
+			Side bc = new Side(b, c);
+			// D4 - creates midpoints
+			Point midAB;
+			Point midAC;
+			Point midBC;
+			
+			if (hm.containsKey(ab)) {
+				midAB = hm.get(ab);
+				hm.remove(ab);
+			} else {
+				midAB = midPoint(a, b);
+				midAB = new Point(midAB.getX(), midAB.getY() + (int) RandomUtilities.randFunc(dev)); // Förskjuter mittpunkt i y-led
+				hm.put(ab, midAB);
+			}
+			if (hm.containsKey(ac)) {
+				midAC = hm.get(ac);
+				hm.remove(ac);
+			} else {
+				midAC = midPoint(a, c);
+				midAC = new Point(midAC.getX(), midAC.getY() + (int) RandomUtilities.randFunc(dev));
+				hm.put(ac, midAC);
+			}
+			if (hm.containsKey(bc)) {
+				midBC = hm.get(bc);
+				hm.remove(bc);
+			} else {
+				midBC = midPoint(b, c);
+				midBC = new Point(midBC.getX(), midBC.getY() + (int) RandomUtilities.randFunc(dev));
+				hm.put(bc, midBC);
+			}
+			
+			fractalLine(t, order - 1, a, midAB, midAC, dev / 2);
+			fractalLine(t, order - 1, b, midAB, midBC, dev / 2);
+			fractalLine(t, order - 1, c, midAC, midBC, dev / 2);
+			fractalLine(t, order - 1, midAB, midAC, midBC, dev / 2);
+		}
+	}
+	
+	/* 
+	 * Hittar punkten mellan två andra punkter
+	 */
+	private Point midPoint(Point a, Point b) {
+		int newX = (a.getX() + b.getX()) / 2;
+		int newY = (a.getY() + b.getY()) / 2;
+		Point mp = new Point (newX, newY);
+ 		return mp;
+	}
+}
